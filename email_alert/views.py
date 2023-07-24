@@ -6,6 +6,8 @@ import pytz
 
 from email_alert.models import Message
 
+EMAIL_DEFAULT_INFO = "今日无重要事件需要提醒!"
+
 
 # Create your views here.
 
@@ -41,7 +43,6 @@ def add_message(request):
 
 
 def get_message(request):
-
     date_begin = datetime.datetime.now().date()
     date_end = (date_begin + datetime.timedelta(1))
     # utc_timezone = pytz.timezone('UTC')
@@ -52,3 +53,17 @@ def get_message(request):
     for mess in messages:
         print(mess.setup_time)
     return JsonResponse({"code": 200})
+
+
+def send_email(request):
+    date_begin = datetime.datetime.now().date()
+    date_end = (date_begin + datetime.timedelta(1))
+
+    email_info = EMAIL_DEFAULT_INFO
+    messages = Message.objects.filter(setup_time__range=[date_begin, date_end])
+    if len(messages) > 0:
+        email_info = "下面是今日注意事项：\n"
+        for message in messages:
+            email_info += f"{message.message_info}\n"
+
+    return JsonResponse({"code": 200, "message": email_info})
