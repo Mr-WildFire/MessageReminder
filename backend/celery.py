@@ -14,10 +14,10 @@ app.autodiscover_tasks()
 
 app.conf.update(
     CELERYBEAT_SCHEDULE={
-        "every_10_seconds": {
-            'task': "email_alert.tasks.print_hello",
-            'schedule': timedelta(seconds=10),
-        },
+        # "every_10_seconds": {
+        #     'task': "email_alert.tasks.print_hello",
+        #     'schedule': timedelta(seconds=10),
+        # },
         "every_day_20_or_22_hour": {
             'task': "email_alert.tasks.send_email",
             'schedule': crontab(minute=00, hour="20,22")

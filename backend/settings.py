@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import datetime
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -136,3 +138,33 @@ CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    'formatters': {  # 格式
+        'verbose': {
+            'format': '{levelname} {asctime} {module} : {message}',
+            'style': '{',
+        },
+    },
+    "handlers": {   # 处理器
+        "console": {
+            "class": "logging.StreamHandler",
+            'formatter': 'verbose',
+        },
+        "file": {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': f'./logs/{datetime.datetime.now().strftime("%Y-%m-%d")}.log',
+            'formatter': 'verbose',
+        }
+    },
+    "loggers": {
+        'email_alert': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}

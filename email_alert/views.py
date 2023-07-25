@@ -2,21 +2,19 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 import json
 import datetime
-import pytz
-
 from email_alert.models import Message
 
-EMAIL_DEFAULT_INFO = "今日无重要事件需要提醒!"
+import logging
+logger = logging.getLogger(__name__)
 
 
 # Create your views here.
-
-
 def index(request):
     return HttpResponse("Hello World!")
 
 
 def add_message(request):
+    """添加信息"""
     if request.method == "POST":
         body = request.body
         info = json.loads(body.decode())
@@ -43,27 +41,15 @@ def add_message(request):
 
 
 def get_message(request):
+    logger.debug("info")
+    "获取当天的待提示信息"
     date_begin = datetime.datetime.now().date()
     date_end = (date_begin + datetime.timedelta(1))
-    # utc_timezone = pytz.timezone('UTC')
-    # date_begin = utc_timezone.localize(date_begin)
-    # date_end = utc_timezone.localize(date_end)
 
     messages = Message.objects.filter(setup_time__range=[date_begin, date_end])
+    message_info = []
     for mess in messages:
-        print(mess.setup_time)
-    return JsonResponse({"code": 200})
+        message_info.append(mess.message_info)
+    message_info = ';'.join(message_info)
 
-
-def send_email(request):
-    date_begin = datetime.datetime.now().date()
-    date_end = (date_begin + datetime.timedelta(1))
-
-    email_info = EMAIL_DEFAULT_INFO
-    messages = Message.objects.filter(setup_time__range=[date_begin, date_end])
-    if len(messages) > 0:
-        email_info = "下面是今日注意事项：\n"
-        for message in messages:
-            email_info += f"{message.message_info}\n"
-
-    return JsonResponse({"code": 200, "message": email_info})
+    return JsonResponse({"code": 200, "data": message_info})
