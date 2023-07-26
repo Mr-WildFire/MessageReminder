@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 import json
 import datetime
 from email_alert.models import Message
+from django.contrib.auth.decorators import login_required
 
 import logging
 logger = logging.getLogger(__name__)
@@ -13,6 +14,7 @@ def index(request):
     return HttpResponse("Hello World!")
 
 
+@login_required
 def add_message(request):
     """添加信息"""
     if request.method == "POST":

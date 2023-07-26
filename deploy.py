@@ -35,6 +35,13 @@ def deploy_debug():
             cmd = f"kill -9 {keywords[1]}"
             os.system(cmd)
 
+    info2 = subprocess.getoutput(f"lsof -i:{PRODUCT_PORT}")  # 根据pid杀死django进程
+    if info2 != "":
+        keywords = info2.split("\n")[1]
+        keywords = keywords.split()
+        cmd = f"kill -9 {keywords[1]}"
+        os.system(cmd)
+
     # 参考博客:https://blog.csdn.net/Mr_Li1/article/details/89353276
     cmd0 = "python3 manage.py runserver &"
     os.system(cmd0)
@@ -82,7 +89,7 @@ def deploy_product():
 
 def main_process():
     # deploy_type = getTerminalInput()
-    deploy_type = 'product'
+    deploy_type = 'debug'
     if deploy_type == DEPLOY_DEBUG:
         deploy_debug()
     else:

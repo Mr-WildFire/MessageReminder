@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'email_alert',
+    'user_manage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -162,6 +163,11 @@ LOGGING = {
     },
     "loggers": {
         'email_alert': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'user_manage': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
             'propagate': True,
