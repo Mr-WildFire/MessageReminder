@@ -41,7 +41,6 @@ def add_message(request):
 
 
 def get_message(request):
-    logger.debug("info")
     "获取当天的待提示信息"
     date_begin = datetime.datetime.now().date()
     date_end = (date_begin + datetime.timedelta(1))
