@@ -20,7 +20,7 @@ app.conf.update(
         # },
         "every_day_20_or_22_hour": {
             'task': "email_alert.tasks.send_email",
-            'schedule': crontab(minute=00, hour="20,22")
+            'schedule': crontab(minute=46, hour="9")
         }
     }
 )
