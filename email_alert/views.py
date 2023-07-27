@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 import json
 import datetime
-from email_alert.models import Message
+from email_alert.models import Message, MESSAGE_LEVEL
 from django.contrib.auth.decorators import login_required
 
 import logging
@@ -20,9 +20,14 @@ def add_message(request):
     if request.method == "POST":
         body = request.body
         info = json.loads(body.decode())
-
+        user_id = request.user.pk
         message = info.get("message")
-        Message.objects.create(message_info=message)
+        level = info.get("level")
+        level = MESSAGE_LEVEL.get(level, 0)
+
+        Message.objects.create(message_info=message,
+                               message_level=level,
+                               user_id=user_id)
 
         result = {
             "code": 200,
@@ -42,12 +47,16 @@ def add_message(request):
         return response
 
 
+@login_required
 def get_message(request):
-    "获取当天的待提示信息"
+    "获取当天的待提示信息展示在主页面上"
     date_begin = datetime.datetime.now().date()
     date_end = (date_begin + datetime.timedelta(1))
+    user_id = request.user.pk
 
-    messages = Message.objects.filter(setup_time__range=[date_begin, date_end])
+    messages = Message.objects.filter(
+        setup_time__range=[date_begin, date_end], user_id=user_id).order_by("-message_level")
+
     message_info = []
     for mess in messages:
         message_info.append(mess.message_info)
