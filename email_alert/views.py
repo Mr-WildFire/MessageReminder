@@ -14,13 +14,15 @@ def index(request):
     return HttpResponse("Hello World!")
 
 
-@login_required
+# @login_required
 def add_message(request):
     """添加信息"""
     if request.method == "POST":
         body = request.body
         info = json.loads(body.decode())
         user_id = request.user.pk
+        if not user_id:
+            user_id = 1
         message = info.get("message")
         level = info.get("level")
         level = MESSAGE_LEVEL.get(level, 0)
@@ -47,19 +49,24 @@ def add_message(request):
         return response
 
 
-@login_required
+# @login_required
 def get_message(request):
     "获取当天的待提示信息展示在主页面上"
     date_begin = datetime.datetime.now().date()
     date_end = (date_begin + datetime.timedelta(1))
     user_id = request.user.pk
+    if not user_id:
+        user_id = 1
 
     messages = Message.objects.filter(
         setup_time__range=[date_begin, date_end], user_id=user_id).order_by("-message_level")
 
     message_info = []
     for mess in messages:
-        message_info.append(mess.message_info)
-    message_info = ';'.join(message_info)
+        message_info.append({
+            "date": mess.setup_time,
+            "level": mess.message_level,
+            "message": mess.message_info
+        })
 
-    return JsonResponse({"code": 200, "data": message_info})
+    return JsonResponse({"code": 200, "data": message_info, "message": "查询成功!"})
